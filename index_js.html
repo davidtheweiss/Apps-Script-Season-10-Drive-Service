@@ -1,0 +1,32 @@
+<script>
+document.addEventListener('DOMContentLoaded', _ => {
+  google.script.run.withSuccessHandler(displayPhotos).withFailureHandler(onFailure).getPhotos();
+});
+
+document.getElementById('addPhotoBtn').addEventListener('click', _ => {
+  const photo = document.querySelector('input[type=file]').files[0];
+  const reader = new FileReader();
+  reader.addEventListener('load', (e) => {
+    const obj = {
+      filename: photo.name,
+      bytes: [...new Int8Array(e.target.result)]
+    };
+    google.script.run.withSuccessHandler(displayPhotos).uploadPhoto(obj);
+  });
+  reader.readAsArrayBuffer(photo);
+});
+      
+function displayPhotos(urlArray) {
+  for (url of urlArray) {
+    let node = document.createElement("IMG");
+    node.src = url;
+    const container = document.getElementById('photo_container');
+    container.insertBefore(node, container.childNodes[0]);
+  }
+}
+      
+function onFailure(err) {
+  console.error(err);
+}
+</script>
+
